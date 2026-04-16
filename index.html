@@ -1,0 +1,2463 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>TASKBOARD // RetroTask</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+:root {
+  --blue: #0055FF;
+  --blue-light: #3377FF;
+  --blue-dark: #0033AA;
+  --yellow: #FFD600;
+  --yellow-light: #FFEB80;
+  --white: #FFFFFF;
+  --off-white: #F0F2F8;
+  --dark: #0a0a2e;
+  --dark2: #12123a;
+  --dark3: #1a1a4e;
+  --gray: #6B7280;
+  --gray-light: #9CA3AF;
+  --red: #FF3B5C;
+  --green: #00C853;
+  --orange: #FF9100;
+  --purple: #7C3AED;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Kanit', sans-serif;
+  background: var(--dark);
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* === SCROLLBAR === */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--dark2); }
+::-webkit-scrollbar-thumb { background: var(--blue); border-radius: 3px; }
+
+/* === TOP NAV === */
+.topnav {
+  background: linear-gradient(135deg, var(--dark2) 0%, var(--dark3) 100%);
+  border-bottom: 3px solid var(--yellow);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-family: 'Space Mono', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--yellow);
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  width: 36px; height: 36px;
+  background: var(--yellow);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--dark);
+  font-size: 18px;
+  font-weight: 700;
+  transform: rotate(-3deg);
+}
+
+.nav-views {
+  display: flex;
+  gap: 4px;
+  background: var(--dark);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.nav-btn {
+  padding: 8px 18px;
+  border: none;
+  background: transparent;
+  color: var(--gray-light);
+  font-family: 'Kanit', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nav-btn:hover { color: var(--white); }
+.nav-btn.active { background: var(--blue); color: var(--white); }
+
+.nav-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.btn-add {
+  background: var(--yellow);
+  color: var(--dark);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-family: 'Kanit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.btn-add:hover { background: var(--yellow-light); transform: translateY(-1px); }
+
+.btn-icon {
+  background: var(--dark3);
+  color: var(--white);
+  border: 2px solid var(--dark3);
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: all 0.2s;
+}
+
+.btn-icon:hover { border-color: var(--blue); background: var(--blue); }
+
+/* === MAIN LAYOUT === */
+.main-layout {
+  display: flex;
+  height: calc(100vh - 64px);
+}
+
+/* === SIDEBAR === */
+.sidebar {
+  width: 260px;
+  background: var(--dark2);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  padding: 20px 16px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.sidebar-section { margin-bottom: 24px; }
+
+.sidebar-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+  padding-left: 8px;
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: transparent;
+  color: var(--gray-light);
+  font-family: 'Kanit', sans-serif;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+}
+
+.filter-btn:hover { background: rgba(255,255,255,0.05); color: var(--white); }
+.filter-btn.active { background: var(--blue); color: var(--white); }
+
+.filter-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.filter-count {
+  margin-left: auto;
+  background: rgba(255,255,255,0.1);
+  color: var(--gray-light);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+
+.sidebar-stats {
+  background: linear-gradient(135deg, var(--blue-dark), var(--dark3));
+  border-radius: 14px;
+  padding: 18px;
+  border: 1px solid rgba(0,85,255,0.3);
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.stat-label { font-size: 13px; color: var(--gray-light); }
+.stat-value { font-size: 16px; font-weight: 600; color: var(--yellow); }
+
+.progress-bar {
+  height: 6px;
+  background: var(--dark);
+  border-radius: 3px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--yellow), var(--green));
+  border-radius: 3px;
+  transition: width 0.5s;
+}
+
+/* === CONTENT === */
+.content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.content-title {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: var(--dark2);
+  border: 2px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 8px 14px;
+  gap: 8px;
+  width: 280px;
+}
+
+.search-box input {
+  background: none;
+  border: none;
+  color: var(--white);
+  font-family: 'Kanit', sans-serif;
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+}
+
+.search-box input::placeholder { color: var(--gray); }
+
+/* === LIST VIEW === */
+.task-list { display: flex; flex-direction: column; gap: 8px; }
+
+.task-card {
+  background: var(--dark2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 36px 1fr 120px 120px 100px 120px 50px;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.task-card:hover {
+  border-color: var(--blue);
+  background: var(--dark3);
+  transform: translateX(4px);
+}
+
+.task-check {
+  width: 28px; height: 28px;
+  border: 2px solid var(--gray);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+  color: transparent;
+  flex-shrink: 0;
+}
+
+.task-check:hover { border-color: var(--green); }
+.task-check.done { background: var(--green); border-color: var(--green); color: var(--white); }
+
+.task-info { min-width: 0; }
+
+.task-name {
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-desc {
+  font-size: 12px;
+  color: var(--gray-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.task-name.completed { text-decoration: line-through; color: var(--gray); }
+
+.task-type-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.type-general { background: rgba(0,85,255,0.15); color: var(--blue-light); }
+.type-meeting { background: rgba(124,58,237,0.15); color: var(--purple); }
+.type-followup { background: rgba(255,145,0,0.15); color: var(--orange); }
+.type-urgent { background: rgba(255,59,92,0.15); color: var(--red); }
+.type-custom { background: rgba(255,214,0,0.15); color: var(--yellow); }
+
+.task-contact {
+  font-size: 13px;
+  color: var(--gray-light);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.status-open { background: rgba(0,85,255,0.15); color: var(--blue-light); }
+.status-inprogress { background: rgba(255,214,0,0.15); color: var(--yellow); }
+.status-waiting { background: rgba(255,145,0,0.15); color: var(--orange); }
+.status-done { background: rgba(0,200,83,0.15); color: var(--green); }
+.status-cancelled { background: rgba(255,59,92,0.15); color: var(--red); }
+
+.task-date {
+  font-size: 12px;
+  color: var(--gray-light);
+  text-align: center;
+}
+
+.task-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.task-act-btn {
+  width: 28px; height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--gray);
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+
+.task-act-btn:hover { background: rgba(255,255,255,0.1); color: var(--white); }
+.task-act-btn.del:hover { background: rgba(255,59,92,0.2); color: var(--red); }
+
+/* === KANBAN VIEW === */
+.kanban-board {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 20px;
+  min-height: calc(100vh - 170px);
+}
+
+.kanban-col {
+  min-width: 280px;
+  max-width: 320px;
+  flex: 1;
+  background: var(--dark2);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.kanban-col-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid;
+}
+
+.kanban-col-title {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kanban-count {
+  width: 24px; height: 24px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.kanban-cards {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  min-height: 100px;
+}
+
+.kanban-card {
+  background: var(--dark3);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.kanban-card:hover {
+  border-color: var(--blue);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0,85,255,0.15);
+}
+
+.kanban-card-title { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+
+.kanban-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.kanban-card-tag {
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  background: rgba(255,255,255,0.06);
+  color: var(--gray-light);
+}
+
+.kanban-card-date {
+  font-size: 11px;
+  color: var(--gray);
+  margin-top: 8px;
+}
+
+/* === CALENDAR VIEW === */
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.cal-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cal-nav-btn {
+  width: 36px; height: 36px;
+  border: 2px solid rgba(255,255,255,0.1);
+  background: var(--dark2);
+  color: var(--white);
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.15s;
+}
+
+.cal-nav-btn:hover { border-color: var(--blue); background: var(--blue); }
+
+.cal-month-title {
+  font-size: 20px;
+  font-weight: 600;
+  min-width: 200px;
+  text-align: center;
+}
+
+.cal-view-toggle {
+  display: flex;
+  gap: 4px;
+  background: var(--dark2);
+  padding: 3px;
+  border-radius: 10px;
+}
+
+.cal-view-btn {
+  padding: 6px 14px;
+  border: none;
+  background: transparent;
+  color: var(--gray-light);
+  font-family: 'Kanit', sans-serif;
+  font-size: 13px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.cal-view-btn.active { background: var(--blue); color: var(--white); }
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.cal-day-header {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray);
+  padding: 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.cal-day {
+  min-height: 100px;
+  background: var(--dark2);
+  border-radius: 10px;
+  padding: 8px;
+  border: 1px solid rgba(255,255,255,0.04);
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.cal-day:hover { border-color: var(--blue); }
+.cal-day.other-month { opacity: 0.3; }
+.cal-day.today { border-color: var(--yellow); border-width: 2px; }
+
+.cal-day-num {
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  color: var(--gray-light);
+}
+
+.cal-day.today .cal-day-num {
+  color: var(--yellow);
+  font-weight: 700;
+}
+
+.cal-event {
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+/* Week view */
+.cal-week-grid {
+  display: grid;
+  grid-template-columns: 60px repeat(7, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.cal-week-time {
+  background: var(--dark2);
+  padding: 8px;
+  font-size: 11px;
+  color: var(--gray);
+  text-align: right;
+  height: 50px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+.cal-week-cell {
+  background: var(--dark2);
+  padding: 4px;
+  min-height: 50px;
+  border-left: 1px solid rgba(255,255,255,0.04);
+  position: relative;
+}
+
+.cal-week-header {
+  background: var(--dark3);
+  padding: 10px 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.cal-week-header.today-h { color: var(--yellow); border-bottom: 2px solid var(--yellow); }
+
+/* Day view */
+.cal-day-view {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.cal-dv-row {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: 1px;
+}
+
+.cal-dv-time {
+  background: var(--dark2);
+  padding: 12px 8px;
+  font-size: 12px;
+  color: var(--gray);
+  text-align: right;
+  min-height: 60px;
+}
+
+.cal-dv-slot {
+  background: var(--dark2);
+  padding: 8px;
+  min-height: 60px;
+  border-left: 2px solid rgba(255,255,255,0.04);
+  position: relative;
+}
+
+.cal-dv-event {
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+
+/* === MODAL === */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.show { display: flex; }
+
+.modal {
+  background: var(--dark2);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.modal-title { font-size: 18px; font-weight: 600; }
+
+.modal-close {
+  width: 36px; height: 36px;
+  border: none;
+  background: rgba(255,255,255,0.06);
+  color: var(--white);
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+}
+
+.modal-close:hover { background: var(--red); }
+
+.modal-body { padding: 24px; }
+
+.form-group { margin-bottom: 18px; }
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gray-light);
+  margin-bottom: 6px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--dark);
+  border: 2px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  color: var(--white);
+  font-family: 'Kanit', sans-serif;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  border-color: var(--blue);
+}
+
+.form-textarea { min-height: 80px; resize: vertical; }
+.form-select { cursor: pointer; }
+.form-select option { background: var(--dark); }
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 24px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.btn-cancel {
+  padding: 10px 24px;
+  background: transparent;
+  border: 2px solid rgba(255,255,255,0.1);
+  color: var(--white);
+  font-family: 'Kanit', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-cancel:hover { border-color: var(--white); }
+
+.btn-save {
+  padding: 10px 30px;
+  background: var(--blue);
+  border: none;
+  color: var(--white);
+  font-family: 'Kanit', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-save:hover { background: var(--blue-light); }
+
+.btn-delete {
+  padding: 10px 24px;
+  background: rgba(255,59,92,0.15);
+  border: none;
+  color: var(--red);
+  font-family: 'Kanit', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-right: auto;
+  transition: all 0.15s;
+}
+
+.btn-delete:hover { background: rgba(255,59,92,0.3); }
+
+/* === TOAST === */
+.toast-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  background: var(--dark2);
+  border: 1px solid var(--blue);
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 300px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  animation: toastIn 0.3s ease;
+}
+
+.toast.out { animation: toastOut 0.3s ease forwards; }
+
+.toast-icon { font-size: 20px; }
+.toast-text { font-size: 14px; flex: 1; }
+
+@keyframes toastIn { from { opacity:0; transform: translateX(50px); } to { opacity:1; transform: translateX(0); } }
+@keyframes toastOut { from { opacity:1; transform: translateX(0); } to { opacity:0; transform: translateX(50px); } }
+
+/* === NOTIFICATION PANEL === */
+.notif-panel {
+  display: none;
+  position: fixed;
+  top: 64px;
+  right: 20px;
+  width: 360px;
+  max-height: 500px;
+  background: var(--dark2);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  z-index: 150;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+
+.notif-panel.show { display: block; }
+
+.notif-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notif-list {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.notif-item {
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 4px;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+
+.notif-item:hover { background: rgba(255,255,255,0.04); }
+.notif-item-title { font-size: 13px; font-weight: 500; }
+.notif-item-desc { font-size: 12px; color: var(--gray-light); margin-top: 2px; }
+.notif-item-time { font-size: 11px; color: var(--gray); margin-top: 4px; }
+
+.notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--red);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notif-dot { position: relative; }
+
+.notif-empty {
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--gray);
+  font-size: 14px;
+}
+
+/* === EMPTY STATE === */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--gray);
+}
+
+.empty-icon { font-size: 48px; margin-bottom: 12px; }
+.empty-text { font-size: 16px; margin-bottom: 8px; }
+.empty-sub { font-size: 13px; color: var(--gray); }
+
+/* === HAMBURGER BUTTON === */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--white);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: background 0.15s;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+}
+.hamburger:hover { background: rgba(255,255,255,0.1); }
+
+/* === SIDEBAR OVERLAY (mobile/tablet) === */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 90;
+}
+.sidebar-overlay.show { display: block; }
+
+/* === MOBILE TASK CARD (stack layout) === */
+.task-card-mobile {
+  background: var(--dark2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 10px;
+  transition: all 0.2s;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.task-card-mobile:hover,
+.task-card-mobile:active {
+  border-color: var(--blue);
+  background: var(--dark3);
+}
+
+.task-card-mobile .tc-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.task-card-mobile .tc-check {
+  width: 32px; height: 32px;
+  border: 2px solid var(--gray);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  font-size: 16px;
+  color: transparent;
+  min-width: 44px;
+  min-height: 44px;
+  margin: -6px;
+  padding: 6px;
+}
+.task-card-mobile .tc-check.done { background: var(--green); border-color: var(--green); color: var(--white); }
+
+.task-card-mobile .tc-body { flex: 1; min-width: 0; }
+
+.task-card-mobile .tc-name {
+  font-size: 15px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  word-wrap: break-word;
+}
+.task-card-mobile .tc-name.completed { text-decoration: line-through; color: var(--gray); }
+
+.task-card-mobile .tc-desc {
+  font-size: 13px;
+  color: var(--gray-light);
+  margin-bottom: 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.task-card-mobile .tc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.task-card-mobile .tc-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: var(--gray);
+  border-top: 1px solid rgba(255,255,255,0.04);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+.task-card-mobile .tc-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.task-card-mobile .tc-actions button {
+  width: 36px; height: 36px;
+  border: none;
+  background: rgba(255,255,255,0.06);
+  color: var(--gray-light);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  min-width: 44px;
+  min-height: 44px;
+}
+.task-card-mobile .tc-actions button:active { background: rgba(255,255,255,0.15); }
+.task-card-mobile .tc-actions button.del:active { background: rgba(255,59,92,0.3); color: var(--red); }
+
+/* === MOBILE SEARCH (expandable) === */
+.search-mobile-toggle {
+  display: none;
+  min-width: 44px; min-height: 44px;
+}
+
+.search-expanded {
+  display: none;
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 100%;
+  background: var(--dark2);
+  z-index: 10;
+  padding: 8px 12px;
+  align-items: center;
+  gap: 8px;
+}
+.search-expanded.show { display: flex; }
+
+.search-expanded input {
+  flex: 1;
+  background: var(--dark);
+  border: 2px solid var(--blue);
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: var(--white);
+  font-family: 'Kanit', sans-serif;
+  font-size: 16px;
+  outline: none;
+}
+
+.search-expanded button {
+  background: none;
+  border: none;
+  color: var(--white);
+  font-size: 24px;
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === MOBILE NAV === */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--dark2);
+  border-top: 2px solid var(--yellow);
+  padding: 6px 0;
+  padding-bottom: max(6px, env(safe-area-inset-bottom));
+  z-index: 100;
+}
+
+.mobile-nav-items {
+  display: flex;
+  justify-content: space-around;
+}
+
+.mobile-nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  color: var(--gray);
+  font-family: 'Kanit', sans-serif;
+  font-size: 11px;
+  padding: 6px 10px;
+  cursor: pointer;
+  min-width: 60px;
+  min-height: 48px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-nav-btn.active { color: var(--yellow); }
+.mobile-nav-btn span:first-child { font-size: 22px; }
+
+/* ================================ */
+/* RESPONSIVE BREAKPOINTS           */
+/* ================================ */
+
+/* --- Tablet landscape & small desktop (1024px) --- */
+@media (max-width: 1024px) {
+  .sidebar {
+    position: fixed;
+    top: 64px;
+    left: 0;
+    bottom: 0;
+    z-index: 95;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    width: 280px;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .hamburger { display: flex; }
+
+  .task-card {
+    grid-template-columns: 32px 1fr 100px 80px 40px;
+  }
+  .task-contact, .task-date { display: none; }
+}
+
+/* --- Tablet portrait (768px) --- */
+@media (max-width: 768px) {
+  .topnav {
+    padding: 0 10px;
+    height: 56px;
+    position: relative;
+  }
+  .logo span { display: none; }
+  .nav-views { display: none; }
+  .search-box { display: none; }
+  .search-mobile-toggle { display: flex; }
+  .btn-add span.add-text { display: none; }
+  .btn-add { padding: 10px 14px; }
+
+  .sidebar { top: 56px; }
+
+  .main-layout {
+    height: calc(100vh - 56px - 62px);
+  }
+  .content { padding: 14px; }
+
+  .mobile-nav { display: block; }
+
+  /* Task cards become stacked on mobile */
+  .task-card { display: none; }
+  .task-card-mobile-wrap { display: block; }
+
+  .kanban-col { min-width: 260px; }
+  .kanban-board {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .kanban-col { scroll-snap-align: start; }
+
+  .cal-day { min-height: 65px; padding: 6px; }
+  .cal-day-num { font-size: 12px; }
+  .cal-event { font-size: 10px; padding: 2px 4px; }
+  .cal-header { flex-direction: column; gap: 10px; align-items: stretch; }
+  .cal-nav { justify-content: center; }
+  .cal-view-toggle { justify-content: center; }
+  .cal-month-title { font-size: 17px; min-width: auto; }
+
+  .cal-week-grid { grid-template-columns: 40px repeat(7, 1fr); }
+  .cal-week-time { font-size: 10px; padding: 4px; }
+  .cal-week-header { font-size: 11px; padding: 8px 4px; }
+
+  .form-row { grid-template-columns: 1fr; }
+  .modal { margin: 0; border-radius: 16px 16px 0 0; max-height: 95vh; align-self: flex-end; }
+  .modal-overlay { padding: 0; align-items: flex-end; }
+
+  .notif-panel { right: 10px; left: 10px; width: auto; top: 56px; }
+
+  .toast-container { top: 62px; right: 10px; left: 10px; }
+  .toast { min-width: auto; }
+}
+
+/* --- Phone small (480px) --- */
+@media (max-width: 480px) {
+  .topnav { gap: 4px; }
+  .logo-icon { width: 32px; height: 32px; font-size: 16px; }
+
+  .nav-actions { gap: 4px; }
+  .nav-actions .btn-icon:not(.notif-dot):not(.search-mobile-toggle) { display: none; }
+
+  .content { padding: 10px; }
+
+  .kanban-col { min-width: 85vw; padding: 12px; }
+  .kanban-card { padding: 12px; }
+
+  .cal-grid { gap: 2px; }
+  .cal-day { min-height: 55px; padding: 4px; border-radius: 6px; }
+  .cal-day-header { font-size: 11px; padding: 6px 0; }
+
+  .modal-body { padding: 16px; }
+  .modal-header { padding: 16px; }
+  .modal-footer { padding: 12px 16px; }
+  .form-input, .form-select, .form-textarea { font-size: 16px; padding: 12px; }
+
+  .btn-save, .btn-cancel, .btn-delete { padding: 12px 20px; }
+}
+
+/* --- Landscape phone fix --- */
+@media (max-height: 500px) and (orientation: landscape) {
+  .topnav { height: 48px; }
+  .sidebar { top: 48px; }
+  .main-layout { height: calc(100vh - 48px - 50px); }
+  .mobile-nav { padding: 4px 0; }
+  .mobile-nav-btn { min-height: 40px; padding: 4px 8px; font-size: 10px; }
+  .mobile-nav-btn span:first-child { font-size: 18px; }
+}
+
+/* --- iPad Pro & large tablets (1024-1366px landscape) --- */
+@media (min-width: 1025px) and (max-width: 1366px) {
+  .sidebar { width: 240px; }
+  .task-card {
+    grid-template-columns: 36px 1fr 110px 100px 90px 100px 50px;
+  }
+}
+
+/* Touch device helpers */
+@media (hover: none) and (pointer: coarse) {
+  .task-act-btn { width: 36px; height: 36px; font-size: 16px; }
+  .task-check { width: 36px; height: 36px; }
+  .cal-nav-btn { width: 44px; height: 44px; }
+  .cal-view-btn { padding: 10px 16px; }
+  .filter-btn { padding: 12px; min-height: 44px; }
+  .nav-btn { padding: 10px 20px; }
+  .btn-icon { width: 44px; height: 44px; }
+  .kanban-card { padding: 16px; }
+}
+
+/* Detail view modal extras */
+.detail-notes {
+  background: var(--dark);
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--gray-light);
+  white-space: pre-wrap;
+  min-height: 60px;
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="topnav">
+  <button class="hamburger" onclick="toggleSidebar()" aria-label="เมนู">&#9776;</button>
+  <div class="logo">
+    <div class="logo-icon">T</div>
+    <span>RETROTASK</span>
+  </div>
+  <div class="nav-views" id="navViews">
+    <button class="nav-btn active" onclick="switchView('list')">&#128203; รายการ</button>
+    <button class="nav-btn" onclick="switchView('kanban')">&#9776; บอร์ด</button>
+    <button class="nav-btn" onclick="switchView('calendar')">&#128197; ปฏิทิน</button>
+  </div>
+  <div class="nav-actions">
+    <div class="search-box">
+      <span>&#128269;</span>
+      <input type="text" id="searchInput" placeholder="ค้นหางาน..." oninput="renderCurrentView()">
+    </div>
+    <button class="btn-icon search-mobile-toggle" onclick="toggleMobileSearch()" title="ค้นหา">&#128269;</button>
+    <button class="btn-icon notif-dot" onclick="toggleNotifPanel()" id="notifBtn" title="การแจ้งเตือน">
+      &#128276;
+    </button>
+    <button class="btn-icon" onclick="exportData()" title="ส่งออกข้อมูล">&#128229;</button>
+    <button class="btn-icon" title="นำเข้าข้อมูล" onclick="document.getElementById('importFile').click()">&#128228;</button>
+    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    <button class="btn-add" onclick="openModal()">&#10010; <span class="add-text">เพิ่มงาน</span></button>
+  </div>
+  <!-- Mobile search expanded bar -->
+  <div class="search-expanded" id="searchExpanded">
+    <input type="text" id="searchInputMobile" placeholder="ค้นหางาน..." oninput="syncSearch(this.value)">
+    <button onclick="closeMobileSearch()">&times;</button>
+  </div>
+</nav>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">&#9881; สถานะงาน</div>
+      <button class="filter-btn active" onclick="filterByStatus('all', this)">
+        <span class="filter-dot" style="background:var(--white)"></span> ทั้งหมด <span class="filter-count" id="countAll">0</span>
+      </button>
+      <button class="filter-btn" onclick="filterByStatus('open', this)">
+        <span class="filter-dot" style="background:var(--blue)"></span> เปิดงาน <span class="filter-count" id="countOpen">0</span>
+      </button>
+      <button class="filter-btn" onclick="filterByStatus('inprogress', this)">
+        <span class="filter-dot" style="background:var(--yellow)"></span> กำลังทำ <span class="filter-count" id="countInprogress">0</span>
+      </button>
+      <button class="filter-btn" onclick="filterByStatus('waiting', this)">
+        <span class="filter-dot" style="background:var(--orange)"></span> รอดำเนินการ <span class="filter-count" id="countWaiting">0</span>
+      </button>
+      <button class="filter-btn" onclick="filterByStatus('done', this)">
+        <span class="filter-dot" style="background:var(--green)"></span> เสร็จแล้ว <span class="filter-count" id="countDone">0</span>
+      </button>
+      <button class="filter-btn" onclick="filterByStatus('cancelled', this)">
+        <span class="filter-dot" style="background:var(--red)"></span> ยกเลิก <span class="filter-count" id="countCancelled">0</span>
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">&#128204; ประเภทงาน</div>
+      <button class="filter-btn" onclick="filterByType('all', this)">
+        <span class="filter-dot" style="background:var(--white)"></span> ทุกประเภท
+      </button>
+      <button class="filter-btn" onclick="filterByType('general', this)">
+        <span class="filter-dot" style="background:var(--blue)"></span> งานทั่วไป
+      </button>
+      <button class="filter-btn" onclick="filterByType('meeting', this)">
+        <span class="filter-dot" style="background:var(--purple)"></span> ประชุม/นัดหมาย
+      </button>
+      <button class="filter-btn" onclick="filterByType('followup', this)">
+        <span class="filter-dot" style="background:var(--orange)"></span> ติดตามงาน
+      </button>
+      <button class="filter-btn" onclick="filterByType('urgent', this)">
+        <span class="filter-dot" style="background:var(--red)"></span> เร่งด่วน
+      </button>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">&#128200; สถิติ</div>
+      <div class="sidebar-stats">
+        <div class="stat-row">
+          <span class="stat-label">งานทั้งหมด</span>
+          <span class="stat-value" id="statTotal">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">เสร็จแล้ว</span>
+          <span class="stat-value" id="statDone">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">% สำเร็จ</span>
+          <span class="stat-value" id="statPercent">0%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="content" id="mainContent">
+    <!-- Dynamic content rendered here -->
+  </main>
+</div>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav">
+  <div class="mobile-nav-items">
+    <button class="mobile-nav-btn active" onclick="switchView('list')"><span>&#128203;</span>รายการ</button>
+    <button class="mobile-nav-btn" onclick="switchView('kanban')"><span>&#9776;</span>บอร์ด</button>
+    <button class="mobile-nav-btn" onclick="switchView('calendar')"><span>&#128197;</span>ปฏิทิน</button>
+    <button class="mobile-nav-btn" onclick="openModal()"><span>&#10010;</span>เพิ่ม</button>
+  </div>
+</div>
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-header">
+    <span>&#128276; การแจ้งเตือน</span>
+    <button style="background:none;border:none;color:var(--gray-light);cursor:pointer;font-size:13px" onclick="clearNotifications()">ล้างทั้งหมด</button>
+  </div>
+  <div class="notif-list" id="notifList"></div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- TASK MODAL -->
+<div class="modal-overlay" id="taskModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">&#10010; เพิ่มงานใหม่</div>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">ชื่องาน *</label>
+        <input type="text" class="form-input" id="fName" placeholder="ระบุชื่องาน...">
+      </div>
+      <div class="form-group">
+        <label class="form-label">รายละเอียด</label>
+        <textarea class="form-textarea" id="fDesc" placeholder="รายละเอียดเพิ่มเติม..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">ประเภทงาน</label>
+          <select class="form-select" id="fType">
+            <option value="general">งานทั่วไป</option>
+            <option value="meeting">ประชุม/นัดหมาย</option>
+            <option value="followup">ติดตามงาน</option>
+            <option value="urgent">เร่งด่วน</option>
+            <option value="custom">กำหนดเอง...</option>
+          </select>
+        </div>
+        <div class="form-group" id="customTypeGroup" style="display:none">
+          <label class="form-label">ชื่อประเภท</label>
+          <input type="text" class="form-input" id="fCustomType" placeholder="ระบุประเภท...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">สถานะ</label>
+          <select class="form-select" id="fStatus">
+            <option value="open">เปิดงาน</option>
+            <option value="inprogress">กำลังทำ</option>
+            <option value="waiting">รอดำเนินการ</option>
+            <option value="done">เสร็จแล้ว</option>
+            <option value="cancelled">ยกเลิก</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">คนที่ต้องประสาน</label>
+        <input type="text" class="form-input" id="fContact" placeholder="ชื่อ, เบอร์, หรืออีเมล">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">วันเริ่มงาน</label>
+          <input type="datetime-local" class="form-input" id="fStart">
+        </div>
+        <div class="form-group">
+          <label class="form-label">กำหนดเสร็จ</label>
+          <input type="datetime-local" class="form-input" id="fEnd">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">แจ้งเตือนก่อน</label>
+          <select class="form-select" id="fReminder">
+            <option value="0">ไม่แจ้งเตือน</option>
+            <option value="15">15 นาทีก่อน</option>
+            <option value="30">30 นาทีก่อน</option>
+            <option value="60">1 ชั่วโมงก่อน</option>
+            <option value="1440">1 วันก่อน</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">ระดับความสำคัญ</label>
+          <select class="form-select" id="fPriority">
+            <option value="low">ต่ำ</option>
+            <option value="medium" selected>ปานกลาง</option>
+            <option value="high">สูง</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ผลลัพธ์ / สะท้อนปัญหา</label>
+        <textarea class="form-textarea" id="fNotes" placeholder="บันทึกผลลัพธ์หรือปัญหาที่พบ..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-delete" id="btnDelete" style="display:none" onclick="deleteTask()">&#128465; ลบ</button>
+      <button class="btn-cancel" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn-save" onclick="saveTask()">&#128190; บันทึก</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-overlay" id="detailModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="detailTitle">รายละเอียดงาน</div>
+      <button class="modal-close" onclick="closeDetailModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeDetailModal()">ปิด</button>
+      <button class="btn-save" onclick="editFromDetail()">&#9998; แก้ไข</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==============================
+// DATA & STATE
+// ==============================
+let tasks = [];
+let notifications = [];
+let currentView = 'list';
+let currentFilter = { status: 'all', type: 'all' };
+let editingId = null;
+let calView = 'month';
+let calDate = new Date();
+let detailTaskId = null;
+let notifTimers = [];
+
+const STATUS_MAP = {
+  open: 'เปิดงาน',
+  inprogress: 'กำลังทำ',
+  waiting: 'รอดำเนินการ',
+  done: 'เสร็จแล้ว',
+  cancelled: 'ยกเลิก'
+};
+
+const TYPE_MAP = {
+  general: 'งานทั่วไป',
+  meeting: 'ประชุม/นัดหมาย',
+  followup: 'ติดตามงาน',
+  urgent: 'เร่งด่วน'
+};
+
+const STATUS_CLASS = {
+  open: 'status-open',
+  inprogress: 'status-inprogress',
+  waiting: 'status-waiting',
+  done: 'status-done',
+  cancelled: 'status-cancelled'
+};
+
+const TYPE_CLASS = {
+  general: 'type-general',
+  meeting: 'type-meeting',
+  followup: 'type-followup',
+  urgent: 'type-urgent'
+};
+
+// ==============================
+// STORAGE
+// ==============================
+function saveData() {
+  try {
+    localStorage.setItem('retrotask_tasks', JSON.stringify(tasks));
+    localStorage.setItem('retrotask_notifs', JSON.stringify(notifications));
+  } catch(e) { console.log('Storage not available'); }
+}
+
+function loadData() {
+  try {
+    const t = localStorage.getItem('retrotask_tasks');
+    const n = localStorage.getItem('retrotask_notifs');
+    if (t) tasks = JSON.parse(t);
+    if (n) notifications = JSON.parse(n);
+  } catch(e) { console.log('Storage not available'); }
+}
+
+// ==============================
+// INIT
+// ==============================
+function init() {
+  loadData();
+  renderCurrentView();
+  updateSidebar();
+  updateNotifBadge();
+  setupNotifications();
+  setupReminderCheck();
+
+  document.getElementById('fType').addEventListener('change', function() {
+    document.getElementById('customTypeGroup').style.display = this.value === 'custom' ? 'block' : 'none';
+  });
+
+  // Request notification permission
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+// ==============================
+// VIEW SWITCHING
+// ==============================
+function switchView(view) {
+  currentView = view;
+  // Update nav buttons
+  document.querySelectorAll('#navViews .nav-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#navViews .nav-btn')[['list','kanban','calendar'].indexOf(view)].classList.add('active');
+  // Update mobile nav
+  document.querySelectorAll('.mobile-nav-btn').forEach((b,i) => {
+    if(i < 3) b.classList.toggle('active', i === ['list','kanban','calendar'].indexOf(view));
+  });
+  renderCurrentView();
+}
+
+function renderCurrentView() {
+  const filtered = getFilteredTasks();
+  switch(currentView) {
+    case 'list': renderListView(filtered); break;
+    case 'kanban': renderKanbanView(filtered); break;
+    case 'calendar': renderCalendarView(filtered); break;
+  }
+}
+
+function getFilteredTasks() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  return tasks.filter(t => {
+    if (currentFilter.status !== 'all' && t.status !== currentFilter.status) return false;
+    if (currentFilter.type !== 'all' && t.type !== currentFilter.type) return false;
+    if (search && !t.name.toLowerCase().includes(search) && !(t.description||'').toLowerCase().includes(search) && !(t.contact||'').toLowerCase().includes(search)) return false;
+    return true;
+  });
+}
+
+// ==============================
+// RESPONSIVE HELPERS
+// ==============================
+function isMobile() { return window.innerWidth <= 768; }
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+function toggleMobileSearch() {
+  const el = document.getElementById('searchExpanded');
+  el.classList.add('show');
+  el.querySelector('input').focus();
+}
+
+function closeMobileSearch() {
+  document.getElementById('searchExpanded').classList.remove('show');
+}
+
+function syncSearch(val) {
+  document.getElementById('searchInput').value = val;
+  renderCurrentView();
+}
+
+// Close sidebar when filter clicked on mobile
+const origFilterByStatus = filterByStatus;
+const origFilterByType = filterByType;
+
+// ==============================
+// LIST VIEW
+// ==============================
+function renderListView(filtered) {
+  const main = document.getElementById('mainContent');
+  if (filtered.length === 0) {
+    main.innerHTML = `<div class="empty-state"><div class="empty-icon">&#128203;</div><div class="empty-text">ยังไม่มีงาน</div><div class="empty-sub">กดปุ่ม "+ เพิ่มงาน" เพื่อเริ่มต้น</div></div>`;
+    return;
+  }
+
+  const mobile = isMobile();
+  filtered.sort((a,b) => {
+    const prio = {high:0, medium:1, low:2};
+    if (prio[a.priority] !== prio[b.priority]) return prio[a.priority] - prio[b.priority];
+    return new Date(a.endDate || '9999') - new Date(b.endDate || '9999');
+  });
+
+  let html = '';
+  if (mobile) {
+    // Mobile: stacked card layout
+    html = '<div class="task-list-mobile">';
+    filtered.forEach(t => {
+      const isDone = t.status === 'done';
+      const typeName = TYPE_MAP[t.type] || t.customType || t.type;
+      const typeClass = TYPE_CLASS[t.type] || 'type-custom';
+      const endStr = t.endDate ? formatDateShort(t.endDate) : '';
+      const prioMap = {high:'&#9888; สูง', medium:'', low:''};
+
+      html += `
+      <div class="task-card-mobile" onclick="openDetail('${t.id}')">
+        <div class="tc-top">
+          <div class="tc-check ${isDone?'done':''}" onclick="event.stopPropagation();toggleDone('${t.id}')">${isDone?'&#10003;':''}</div>
+          <div class="tc-body">
+            <div class="tc-name ${isDone?'completed':''}">${esc(t.name)}</div>
+            ${t.description ? `<div class="tc-desc">${esc(t.description)}</div>` : ''}
+            <div class="tc-tags">
+              <span class="task-type-badge ${typeClass}">${esc(typeName)}</span>
+              <span class="task-status-badge ${STATUS_CLASS[t.status]}">${STATUS_MAP[t.status]}</span>
+              ${t.priority==='high'?'<span class="task-status-badge" style="background:rgba(255,59,92,0.15);color:var(--red)">&#9888; สูง</span>':''}
+            </div>
+            <div class="tc-bottom">
+              <div>
+                ${t.contact ? `&#128100; ${esc(t.contact)}` : ''}
+                ${t.contact && endStr ? ' &middot; ' : ''}
+                ${endStr ? `&#128197; ${endStr}` : ''}
+              </div>
+              <div class="tc-actions">
+                <button onclick="event.stopPropagation();openModal('${t.id}')" title="แก้ไข">&#9998;</button>
+                <button class="del" onclick="event.stopPropagation();quickDelete('${t.id}')" title="ลบ">&#128465;</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  } else {
+    // Desktop: grid layout
+    html = '<div class="task-list">';
+    filtered.forEach(t => {
+      const isDone = t.status === 'done';
+      const typeName = TYPE_MAP[t.type] || t.customType || t.type;
+      const typeClass = TYPE_CLASS[t.type] || 'type-custom';
+      const endStr = t.endDate ? formatDateShort(t.endDate) : '-';
+
+      html += `
+      <div class="task-card" ondblclick="openDetail('${t.id}')">
+        <div class="task-check ${isDone?'done':''}" onclick="event.stopPropagation();toggleDone('${t.id}')">${isDone?'&#10003;':''}</div>
+        <div class="task-info">
+          <div class="task-name ${isDone?'completed':''}">${esc(t.name)}</div>
+          <div class="task-desc">${esc(t.description||'')}</div>
+        </div>
+        <span class="task-type-badge ${typeClass}">${esc(typeName)}</span>
+        <span class="task-contact">${esc(t.contact||'-')}</span>
+        <span class="task-status-badge ${STATUS_CLASS[t.status]}">${STATUS_MAP[t.status]}</span>
+        <span class="task-date">${endStr}</span>
+        <div class="task-actions">
+          <button class="task-act-btn" onclick="event.stopPropagation();openModal('${t.id}')" title="แก้ไข">&#9998;</button>
+          <button class="task-act-btn del" onclick="event.stopPropagation();quickDelete('${t.id}')" title="ลบ">&#128465;</button>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+  main.innerHTML = html;
+}
+
+// ==============================
+// KANBAN VIEW
+// ==============================
+function renderKanbanView(filtered) {
+  const main = document.getElementById('mainContent');
+  const cols = ['open','inprogress','waiting','done','cancelled'];
+  const colors = { open: 'var(--blue)', inprogress: 'var(--yellow)', waiting: 'var(--orange)', done: 'var(--green)', cancelled: 'var(--red)' };
+
+  let html = '<div class="kanban-board">';
+  cols.forEach(status => {
+    const colTasks = filtered.filter(t => t.status === status);
+    html += `
+    <div class="kanban-col" ondragover="event.preventDefault()" ondrop="dropKanban(event,'${status}')">
+      <div class="kanban-col-header" style="border-color:${colors[status]}">
+        <div class="kanban-col-title" style="color:${colors[status]}">
+          ${STATUS_MAP[status]}
+          <span class="kanban-count">${colTasks.length}</span>
+        </div>
+      </div>
+      <div class="kanban-cards">`;
+
+    colTasks.forEach(t => {
+      const typeName = TYPE_MAP[t.type] || t.customType || t.type;
+      const typeClass = TYPE_CLASS[t.type] || 'type-custom';
+      html += `
+        <div class="kanban-card" draggable="true" ondragstart="dragKanban(event,'${t.id}')" onclick="openDetail('${t.id}')">
+          <div class="kanban-card-title">${esc(t.name)}</div>
+          ${t.description ? `<div style="font-size:12px;color:var(--gray-light)">${esc(t.description.substring(0,60))}${t.description.length>60?'...':''}</div>` : ''}
+          <div class="kanban-card-meta">
+            <span class="kanban-card-tag ${typeClass}">${esc(typeName)}</span>
+            ${t.priority==='high'?'<span class="kanban-card-tag" style="background:rgba(255,59,92,0.15);color:var(--red)">&#9888; สูง</span>':''}
+            ${t.contact?`<span class="kanban-card-tag">&#128100; ${esc(t.contact)}</span>`:''}
+          </div>
+          ${t.endDate?`<div class="kanban-card-date">&#128197; ${formatDateShort(t.endDate)}</div>`:''}
+        </div>`;
+    });
+
+    html += '</div></div>';
+  });
+  html += '</div>';
+  main.innerHTML = html;
+}
+
+let dragTaskId = null;
+function dragKanban(e, id) { dragTaskId = id; e.dataTransfer.effectAllowed = 'move'; }
+function dropKanban(e, status) {
+  e.preventDefault();
+  if (!dragTaskId) return;
+  const task = tasks.find(t => t.id === dragTaskId);
+  if (task) {
+    task.status = status;
+    saveData();
+    renderCurrentView();
+    updateSidebar();
+    showToast(`ย้ายงาน "${task.name}" เป็น ${STATUS_MAP[status]}`);
+  }
+  dragTaskId = null;
+}
+
+// ==============================
+// CALENDAR VIEW
+// ==============================
+function renderCalendarView(filtered) {
+  const main = document.getElementById('mainContent');
+  let html = `
+  <div class="cal-header">
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="calPrev()">&#9664;</button>
+      <div class="cal-month-title" id="calTitle">${getCalTitle()}</div>
+      <button class="cal-nav-btn" onclick="calNext()">&#9654;</button>
+      <button class="cal-nav-btn" onclick="calToday()" style="font-size:12px;width:auto;padding:0 12px">วันนี้</button>
+    </div>
+    <div class="cal-view-toggle">
+      <button class="cal-view-btn ${calView==='month'?'active':''}" onclick="setCalView('month')">เดือน</button>
+      <button class="cal-view-btn ${calView==='week'?'active':''}" onclick="setCalView('week')">สัปดาห์</button>
+      <button class="cal-view-btn ${calView==='day'?'active':''}" onclick="setCalView('day')">วัน</button>
+    </div>
+  </div>`;
+
+  switch(calView) {
+    case 'month': html += renderCalMonth(filtered); break;
+    case 'week': html += renderCalWeek(filtered); break;
+    case 'day': html += renderCalDay(filtered); break;
+  }
+
+  main.innerHTML = html;
+}
+
+function renderCalMonth(filtered) {
+  const y = calDate.getFullYear(), m = calDate.getMonth();
+  const firstDay = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const today = new Date();
+  const dayNames = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+
+  let html = '<div class="cal-grid">';
+  dayNames.forEach(d => { html += `<div class="cal-day-header">${d}</div>`; });
+
+  // Previous month padding
+  const prevDays = new Date(y, m, 0).getDate();
+  for (let i = firstDay - 1; i >= 0; i--) {
+    html += `<div class="cal-day other-month"><div class="cal-day-num">${prevDays - i}</div></div>`;
+  }
+
+  // Current month days
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = today.getFullYear()===y && today.getMonth()===m && today.getDate()===d;
+    const dayTasks = filtered.filter(t => {
+      const s = (t.startDate||'').substring(0,10);
+      const e = (t.endDate||'').substring(0,10);
+      return s === dateStr || e === dateStr;
+    });
+
+    html += `<div class="cal-day ${isToday?'today':''}" onclick="calDayClick('${dateStr}')">
+      <div class="cal-day-num">${d}</div>`;
+    dayTasks.slice(0,3).forEach(t => {
+      const typeClass = TYPE_CLASS[t.type] || 'type-custom';
+      html += `<div class="cal-event ${typeClass}" onclick="event.stopPropagation();openDetail('${t.id}')" title="${esc(t.name)}">${esc(t.name)}</div>`;
+    });
+    if (dayTasks.length > 3) html += `<div style="font-size:10px;color:var(--gray);padding-left:6px">+${dayTasks.length-3} เพิ่มเติม</div>`;
+    html += '</div>';
+  }
+
+  // Next month padding
+  const totalCells = firstDay + daysInMonth;
+  const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (let i = 1; i <= remaining; i++) {
+    html += `<div class="cal-day other-month"><div class="cal-day-num">${i}</div></div>`;
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function renderCalWeek(filtered) {
+  const startOfWeek = getWeekStart(calDate);
+  const dayNames = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+  const today = new Date();
+
+  let html = '<div class="cal-week-grid"><div></div>';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(startOfWeek);
+    d.setDate(d.getDate() + i);
+    const isToday = d.toDateString() === today.toDateString();
+    html += `<div class="cal-week-header ${isToday?'today-h':''}">${dayNames[i]} ${d.getDate()}</div>`;
+  }
+
+  for (let h = 7; h <= 21; h++) {
+    html += `<div class="cal-week-time">${String(h).padStart(2,'0')}:00</div>`;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(startOfWeek);
+      d.setDate(d.getDate() + i);
+      const dateStr = formatLocalDate(d);
+      const hourTasks = filtered.filter(t => {
+        const start = t.startDate || t.endDate;
+        if (!start) return false;
+        return start.substring(0,10) === dateStr && parseInt(start.substring(11,13)) === h;
+      });
+
+      html += '<div class="cal-week-cell">';
+      hourTasks.forEach(t => {
+        const typeClass = TYPE_CLASS[t.type] || 'type-custom';
+        html += `<div class="cal-event ${typeClass}" onclick="openDetail('${t.id}')" style="padding:3px 6px;border-radius:4px;font-size:11px;cursor:pointer;margin-bottom:2px">${esc(t.name)}</div>`;
+      });
+      html += '</div>';
+    }
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function renderCalDay(filtered) {
+  const dateStr = formatLocalDate(calDate);
+  let html = '<div class="cal-day-view">';
+
+  for (let h = 6; h <= 22; h++) {
+    const hourTasks = filtered.filter(t => {
+      const start = t.startDate || t.endDate;
+      if (!start) return false;
+      return start.substring(0,10) === dateStr && parseInt(start.substring(11,13)) === h;
+    });
+
+    html += `<div class="cal-dv-row">
+      <div class="cal-dv-time">${String(h).padStart(2,'0')}:00</div>
+      <div class="cal-dv-slot">`;
+    hourTasks.forEach(t => {
+      const typeClass = TYPE_CLASS[t.type] || 'type-custom';
+      html += `<div class="cal-dv-event ${typeClass}" onclick="openDetail('${t.id}')">
+        <strong>${esc(t.name)}</strong>
+        ${t.contact ? ` &middot; ${esc(t.contact)}` : ''}
+      </div>`;
+    });
+    html += '</div></div>';
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function getCalTitle() {
+  const months = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  if (calView === 'day') {
+    return `${calDate.getDate()} ${months[calDate.getMonth()]} ${calDate.getFullYear() + 543}`;
+  }
+  return `${months[calDate.getMonth()]} ${calDate.getFullYear() + 543}`;
+}
+
+function setCalView(v) { calView = v; renderCurrentView(); }
+
+function calPrev() {
+  if (calView === 'month') calDate.setMonth(calDate.getMonth()-1);
+  else if (calView === 'week') calDate.setDate(calDate.getDate()-7);
+  else calDate.setDate(calDate.getDate()-1);
+  renderCurrentView();
+}
+
+function calNext() {
+  if (calView === 'month') calDate.setMonth(calDate.getMonth()+1);
+  else if (calView === 'week') calDate.setDate(calDate.getDate()+7);
+  else calDate.setDate(calDate.getDate()+1);
+  renderCurrentView();
+}
+
+function calToday() { calDate = new Date(); renderCurrentView(); }
+
+function calDayClick(dateStr) {
+  calDate = new Date(dateStr + 'T00:00:00');
+  calView = 'day';
+  renderCurrentView();
+}
+
+function getWeekStart(d) {
+  const date = new Date(d);
+  date.setDate(date.getDate() - date.getDay());
+  return date;
+}
+
+// ==============================
+// TASK CRUD
+// ==============================
+function openModal(id) {
+  editingId = id || null;
+  const modal = document.getElementById('taskModal');
+  const title = document.getElementById('modalTitle');
+  const delBtn = document.getElementById('btnDelete');
+
+  if (id) {
+    const t = tasks.find(x => x.id === id);
+    if (!t) return;
+    title.textContent = '&#9998; แก้ไขงาน';
+    delBtn.style.display = 'block';
+    document.getElementById('fName').value = t.name;
+    document.getElementById('fDesc').value = t.description || '';
+    document.getElementById('fType').value = t.type;
+    if (t.type === 'custom') {
+      document.getElementById('customTypeGroup').style.display = 'block';
+      document.getElementById('fCustomType').value = t.customType || '';
+    }
+    document.getElementById('fStatus').value = t.status;
+    document.getElementById('fContact').value = t.contact || '';
+    document.getElementById('fStart').value = t.startDate || '';
+    document.getElementById('fEnd').value = t.endDate || '';
+    document.getElementById('fReminder').value = t.reminder || '0';
+    document.getElementById('fPriority').value = t.priority || 'medium';
+    document.getElementById('fNotes').value = t.notes || '';
+  } else {
+    title.innerHTML = '&#10010; เพิ่มงานใหม่';
+    delBtn.style.display = 'none';
+    document.getElementById('fName').value = '';
+    document.getElementById('fDesc').value = '';
+    document.getElementById('fType').value = 'general';
+    document.getElementById('customTypeGroup').style.display = 'none';
+    document.getElementById('fCustomType').value = '';
+    document.getElementById('fStatus').value = 'open';
+    document.getElementById('fContact').value = '';
+    document.getElementById('fStart').value = '';
+    document.getElementById('fEnd').value = '';
+    document.getElementById('fReminder').value = '0';
+    document.getElementById('fPriority').value = 'medium';
+    document.getElementById('fNotes').value = '';
+  }
+
+  modal.classList.add('show');
+  setTimeout(() => document.getElementById('fName').focus(), 100);
+}
+
+function closeModal() {
+  document.getElementById('taskModal').classList.remove('show');
+  editingId = null;
+}
+
+function saveTask() {
+  const name = document.getElementById('fName').value.trim();
+  if (!name) { showToast('กรุณาระบุชื่องาน', 'warn'); return; }
+
+  const type = document.getElementById('fType').value;
+  const data = {
+    name,
+    description: document.getElementById('fDesc').value.trim(),
+    type,
+    customType: type === 'custom' ? document.getElementById('fCustomType').value.trim() : '',
+    status: document.getElementById('fStatus').value,
+    contact: document.getElementById('fContact').value.trim(),
+    startDate: document.getElementById('fStart').value,
+    endDate: document.getElementById('fEnd').value,
+    reminder: document.getElementById('fReminder').value,
+    priority: document.getElementById('fPriority').value,
+    notes: document.getElementById('fNotes').value.trim(),
+    updatedAt: new Date().toISOString()
+  };
+
+  if (editingId) {
+    const idx = tasks.findIndex(t => t.id === editingId);
+    if (idx >= 0) { tasks[idx] = { ...tasks[idx], ...data }; }
+    showToast(`อัปเดตงาน "${name}" เรียบร้อย`);
+  } else {
+    data.id = 'task_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
+    data.createdAt = new Date().toISOString();
+    tasks.push(data);
+    showToast(`เพิ่มงาน "${name}" เรียบร้อย`);
+  }
+
+  saveData();
+  closeModal();
+  renderCurrentView();
+  updateSidebar();
+  setupReminderCheck();
+}
+
+function deleteTask() {
+  if (!editingId) return;
+  const t = tasks.find(x => x.id === editingId);
+  if (confirm(`ต้องการลบงาน "${t.name}" ใช่หรือไม่?`)) {
+    tasks = tasks.filter(x => x.id !== editingId);
+    saveData();
+    closeModal();
+    renderCurrentView();
+    updateSidebar();
+    showToast(`ลบงาน "${t.name}" แล้ว`);
+  }
+}
+
+function quickDelete(id) {
+  const t = tasks.find(x => x.id === id);
+  if (confirm(`ต้องการลบงาน "${t.name}" ใช่หรือไม่?`)) {
+    tasks = tasks.filter(x => x.id !== id);
+    saveData();
+    renderCurrentView();
+    updateSidebar();
+    showToast(`ลบงาน "${t.name}" แล้ว`);
+  }
+}
+
+function toggleDone(id) {
+  const t = tasks.find(x => x.id === id);
+  if (t) {
+    t.status = t.status === 'done' ? 'open' : 'done';
+    t.updatedAt = new Date().toISOString();
+    saveData();
+    renderCurrentView();
+    updateSidebar();
+  }
+}
+
+// ==============================
+// DETAIL VIEW
+// ==============================
+function openDetail(id) {
+  detailTaskId = id;
+  const t = tasks.find(x => x.id === id);
+  if (!t) return;
+
+  const typeName = TYPE_MAP[t.type] || t.customType || t.type;
+  const typeClass = TYPE_CLASS[t.type] || 'type-custom';
+  const prioMap = { low: 'ต่ำ', medium: 'ปานกลาง', high: 'สูง' };
+
+  document.getElementById('detailTitle').textContent = t.name;
+  document.getElementById('detailBody').innerHTML = `
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <span class="task-type-badge ${typeClass}">${esc(typeName)}</span>
+      <span class="task-status-badge ${STATUS_CLASS[t.status]}">${STATUS_MAP[t.status]}</span>
+      ${t.priority==='high'?'<span class="task-status-badge" style="background:rgba(255,59,92,0.15);color:var(--red)">&#9888; ความสำคัญสูง</span>':''}
+    </div>
+    ${t.description?`<div class="form-label">รายละเอียด</div><div class="detail-notes">${esc(t.description)}</div>`:''}
+    ${t.contact?`<div class="form-label" style="margin-top:14px">&#128100; คนที่ต้องประสาน</div><div style="font-size:14px;padding:6px 0">${esc(t.contact)}</div>`:''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
+      <div><div class="form-label">&#128197; เริ่มงาน</div><div style="font-size:14px">${t.startDate?formatDateFull(t.startDate):'-'}</div></div>
+      <div><div class="form-label">&#128197; กำหนดเสร็จ</div><div style="font-size:14px">${t.endDate?formatDateFull(t.endDate):'-'}</div></div>
+    </div>
+    ${t.notes?`<div class="form-label" style="margin-top:14px">&#128221; ผลลัพธ์ / สะท้อนปัญหา</div><div class="detail-notes">${esc(t.notes)}</div>`:''}
+    <div style="margin-top:16px;font-size:11px;color:var(--gray)">
+      สร้างเมื่อ: ${t.createdAt?formatDateFull(t.createdAt):'-'} &middot; อัปเดต: ${t.updatedAt?formatDateFull(t.updatedAt):'-'}
+    </div>
+  `;
+
+  document.getElementById('detailModal').classList.add('show');
+}
+
+function closeDetailModal() { document.getElementById('detailModal').classList.remove('show'); }
+
+function editFromDetail() {
+  closeDetailModal();
+  openModal(detailTaskId);
+}
+
+// ==============================
+// SIDEBAR & FILTERS
+// ==============================
+function updateSidebar() {
+  const counts = { all: tasks.length, open:0, inprogress:0, waiting:0, done:0, cancelled:0 };
+  tasks.forEach(t => { if(counts[t.status] !== undefined) counts[t.status]++; });
+
+  Object.keys(counts).forEach(k => {
+    const el = document.getElementById('count' + k.charAt(0).toUpperCase() + k.slice(1));
+    if (el) el.textContent = counts[k];
+  });
+
+  document.getElementById('statTotal').textContent = tasks.length;
+  document.getElementById('statDone').textContent = counts.done;
+  const pct = tasks.length > 0 ? Math.round(counts.done / tasks.length * 100) : 0;
+  document.getElementById('statPercent').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function filterByStatus(status, btn) {
+  currentFilter.status = status;
+  document.querySelectorAll('.sidebar-section:first-child .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCurrentView();
+  if (isMobile()) closeSidebar();
+}
+
+function filterByType(type, btn) {
+  currentFilter.type = type;
+  document.querySelectorAll('.sidebar-section:nth-child(2) .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCurrentView();
+  if (isMobile()) closeSidebar();
+}
+
+// ==============================
+// NOTIFICATIONS & REMINDERS
+// ==============================
+function setupNotifications() {
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+}
+
+function setupReminderCheck() {
+  notifTimers.forEach(t => clearInterval(t));
+  notifTimers = [];
+
+  const timer = setInterval(() => {
+    const now = new Date();
+    tasks.forEach(t => {
+      if (!t.endDate || t.status === 'done' || t.status === 'cancelled') return;
+      const reminderMin = parseInt(t.reminder) || 0;
+      if (reminderMin <= 0) return;
+
+      const end = new Date(t.endDate);
+      const reminderTime = new Date(end.getTime() - reminderMin * 60000);
+      const diff = Math.abs(now - reminderTime);
+
+      if (diff < 30000 && !t._reminded) {
+        t._reminded = true;
+        const msg = `งาน "${t.name}" จะครบกำหนดใน ${reminderMin < 60 ? reminderMin + ' นาที' : (reminderMin/60) + ' ชั่วโมง'}`;
+        addNotification(msg, t.id);
+        sendBrowserNotif('RetroTask - แจ้งเตือน', msg);
+        showToast(msg);
+      }
+
+      // Overdue notification
+      if (now > end && !t._overdueNotified) {
+        t._overdueNotified = true;
+        const msg = `งาน "${t.name}" เลยกำหนดแล้ว!`;
+        addNotification(msg, t.id);
+        sendBrowserNotif('RetroTask - เลยกำหนด!', msg);
+        showToast(msg, 'warn');
+      }
+    });
+  }, 30000);
+
+  notifTimers.push(timer);
+}
+
+function sendBrowserNotif(title, body) {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, { body, icon: '&#128276;' });
+  }
+}
+
+function addNotification(msg, taskId) {
+  notifications.unshift({
+    id: 'n_' + Date.now(),
+    message: msg,
+    taskId,
+    time: new Date().toISOString(),
+    read: false
+  });
+  if (notifications.length > 50) notifications = notifications.slice(0, 50);
+  saveData();
+  updateNotifBadge();
+  renderNotifList();
+}
+
+function updateNotifBadge() {
+  const unread = notifications.filter(n => !n.read).length;
+  const btn = document.getElementById('notifBtn');
+  const existing = btn.querySelector('.notif-badge');
+  if (existing) existing.remove();
+  if (unread > 0) {
+    btn.insertAdjacentHTML('beforeend', `<span class="notif-badge">${unread}</span>`);
+  }
+}
+
+function toggleNotifPanel() {
+  const panel = document.getElementById('notifPanel');
+  panel.classList.toggle('show');
+  if (panel.classList.contains('show')) {
+    notifications.forEach(n => n.read = true);
+    saveData();
+    updateNotifBadge();
+    renderNotifList();
+  }
+}
+
+function renderNotifList() {
+  const list = document.getElementById('notifList');
+  if (notifications.length === 0) {
+    list.innerHTML = '<div class="notif-empty">&#128276; ไม่มีการแจ้งเตือน</div>';
+    return;
+  }
+  list.innerHTML = notifications.map(n => `
+    <div class="notif-item" onclick="openDetail('${n.taskId}');toggleNotifPanel()">
+      <div class="notif-item-title">${esc(n.message)}</div>
+      <div class="notif-item-time">${formatDateFull(n.time)}</div>
+    </div>`).join('');
+}
+
+function clearNotifications() {
+  notifications = [];
+  saveData();
+  updateNotifBadge();
+  renderNotifList();
+}
+
+// ==============================
+// EXPORT / IMPORT / SHARE
+// ==============================
+function exportData() {
+  const data = JSON.stringify({ tasks, notifications, exportedAt: new Date().toISOString() }, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `retrotask_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('ส่งออกข้อมูลสำเร็จ!');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.tasks) {
+        if (confirm(`พบ ${data.tasks.length} งาน ต้องการนำเข้าหรือไม่?\n(ข้อมูลเดิมจะถูกรวมเข้าด้วย)`)) {
+          const existingIds = new Set(tasks.map(t => t.id));
+          data.tasks.forEach(t => { if (!existingIds.has(t.id)) tasks.push(t); });
+          if (data.notifications) {
+            data.notifications.forEach(n => notifications.push(n));
+          }
+          saveData();
+          renderCurrentView();
+          updateSidebar();
+          showToast(`นำเข้า ${data.tasks.length} งานสำเร็จ!`);
+        }
+      }
+    } catch(err) {
+      showToast('ไฟล์ไม่ถูกต้อง', 'warn');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ==============================
+// TOAST
+// ==============================
+function showToast(msg, type = 'info') {
+  const container = document.getElementById('toastContainer');
+  const icons = { info: '&#9989;', warn: '&#9888;' };
+  const colors = { info: 'var(--blue)', warn: 'var(--orange)' };
+  const id = 'toast_' + Date.now();
+  container.insertAdjacentHTML('beforeend', `
+    <div class="toast" id="${id}" style="border-color:${colors[type]}">
+      <span class="toast-icon">${icons[type]}</span>
+      <span class="toast-text">${msg}</span>
+    </div>`);
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    if (el) { el.classList.add('out'); setTimeout(() => el.remove(), 300); }
+  }, 3000);
+}
+
+// ==============================
+// UTILS
+// ==============================
+function esc(str) { const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+function formatDateShort(str) {
+  if (!str) return '-';
+  const d = new Date(str);
+  return `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()+543}`;
+}
+
+function formatDateFull(str) {
+  if (!str) return '-';
+  const d = new Date(str);
+  const months = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()+543} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+}
+
+function formatLocalDate(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// Close panels on click outside
+document.addEventListener('click', function(e) {
+  const panel = document.getElementById('notifPanel');
+  const btn = document.getElementById('notifBtn');
+  if (panel.classList.contains('show') && !panel.contains(e.target) && !btn.contains(e.target)) {
+    panel.classList.remove('show');
+  }
+});
+
+// Keyboard shortcut
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeModal();
+    closeDetailModal();
+    document.getElementById('notifPanel').classList.remove('show');
+  }
+  if (e.key === 'n' && e.ctrlKey) { e.preventDefault(); openModal(); }
+});
+
+// ==============================
+// RESPONSIVE RE-RENDER ON RESIZE
+// ==============================
+let resizeTimer;
+window.addEventListener('resize', function() {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    renderCurrentView();
+    // Close sidebar if going to desktop
+    if (window.innerWidth > 1024) closeSidebar();
+    // Close mobile search if going to desktop
+    if (window.innerWidth > 768) closeMobileSearch();
+  }, 200);
+});
+
+// ==============================
+// START
+// ==============================
+init();
+</script>
+</body>
+</html>
