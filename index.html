@@ -3,7 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>TASKBOARD // RetroTask</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RetroTask">
+<meta name="theme-color" content="#0a0a2e">
+<link rel="icon" type="image/x-icon" href="data:image/x-icon;base64,AAABAAEAICAAAAAAIAASAQAAFgAAAIlQTkcNChoKAAAADUlIRFIAAAAgAAAAIAgGAAAAc3p69AAAANlJREFUeJxjZMAC/l9j+I9NnFLAqMXAiCFGD4vxOYSJ3paj28VEb8vRHcFESCGtAeNA+B4ZDHgIDLgDWIhRpOimxfDqHVFK4aAo/jVDc+5zguoGPATISoQfPzMzSDlqw/keNp8Y1k54QJYDBjwERh0w6gCM+pkYwMWlJ8DAwPAeSWjrt2+XfMgxi4kc/P37VZSQ+/v3EyO5ZrEwMDAwk+FwbHrIMYeBhYG8dICuhxGLGNEOIMfl2BwwskKAammAkYGBQZAcjdQC5IYAVR0woKXhaAiMhsBoCAAAsOIuheMqsmAAAAAASUVORK5CYII=">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAYAAAA9zQYyAAADY0lEQVR4nO3cP25cVRyG4TORm6QDJBSJjoIiRbaRBbELVsAKKFgCG6CncENBiVLQxk0kU4H44yTjM/f6Hr9+ngXcucq8/vSzIvk0FnB7PW6Pfgcud3o1Toe/wxEfKuCn4YjAH+wDRfy0PVTcu36IiLnLnnHv8mAhc449wn629QPFzLn2aGWznxAhc4mt1nqThRYzl9qqoYt+KoTMHi5Z6+mFFjN7uaStqaDFzN5mG7t30GLmocy0dq+gxcxDu29zZwctZo5yn/bOClrMHO3cBj8ZtJhZxTktbv5f33CkjwZtnVnNp5r8YNBiZlUfa9PJQcqdQVtnVvehRv8XtJh5LO5q1clByr+Cts48Nv9t1kKTImhS/g7aucFj9c92LTQpgibl2RjODR6/vxq20KQImhRBk3JyP1NioUkRNCmCJkXQpAiaFEGTImhSBE2KoEkRNClXR7/AVr7/8Yvx7XdfHf0aj9LPP/w6Xn9zc/RrbMJCkyJoUgRNiqBJETQpgiZF0KQImhRBkyJoUgRNiqBJETQpgiZF0KT4U2CT3v5xNb5+82rz5375+fvx20/Xmz/3qbDQpAiaFEGTImhSBE2KoEkRNCmCJkXQpAiaFEGTImhSBE2KoEkRNCmCJkXQpAiaFEGTImhSBE2KoEkRNCmCJkXQpAiaFEGTImhSBE3K6egXeKxevHj9cozx+w6Pfvvu3S8vd3juk2ChSRE0KVfD2THl5ub69Pz59n/w/Pb2/Ri+k2kWmhQLPW/PfzffySQLTYqFnmehF2ShSbHQ8yz0giw0KYImxckxz8mxIAtNioVez2n4TqZZaFIs9Dw39IIsNCkWep6FXpCFJkXQpDg55jk5FmShSbHQ8yz0giw0KRZ6noVekIUmxULPs9ALstCkCJoUJ8c8J8eCLDQpFnqehV6QhSbFQs+z0Auy0KRY6DX5TiZZaFIETcppjPHZ0S8BW7HQpPilkBQLTYqFJsVCk2KhSbHQpAiaFCcHKRaaFAtNioUmxUKTYqFJsdCkWGhSBE2Kk4MUC02KhSbFQpNioUmx0KRYaFIsNCmCJsXJQYqFJsVCk2KhSbHQpFhoUiw0KRaaFEGT4uQgxUKTYqFJsdCkWGhSLDQpFpoUC02KoElxcpBioUmx0KRYaFIsNCkWmpQ/Aaz6jiRBAKGEAAAAAElFTkSuQmCC">
+<title>RETROTASK // To-Do List</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 
@@ -66,15 +72,12 @@ body {
   gap: 10px;
 }
 
-.logo-icon {
-  width: 36px; height: 36px;
-  background: var(--yellow);
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--dark);
-  font-size: 18px;
-  font-weight: 700;
+.logo-img {
+  width: 38px; height: 38px;
+  border-radius: 9px;
+  object-fit: contain;
   transform: rotate(-3deg);
+  box-shadow: 0 2px 8px rgba(255,214,0,0.3);
 }
 
 .nav-views {
@@ -155,7 +158,102 @@ body {
   padding: 20px 16px;
   overflow-y: auto;
   flex-shrink: 0;
+  transition: width 0.3s ease, padding 0.3s ease, opacity 0.3s ease;
 }
+
+.sidebar.collapsed {
+  width: 0;
+  padding: 0;
+  overflow: hidden;
+  opacity: 0;
+  border-right: none;
+}
+
+/* Toggle sidebar button (desktop) */
+.sidebar-toggle-desktop {
+  position: absolute;
+  top: 50%;
+  left: 260px;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 48px;
+  background: var(--dark3);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  color: var(--gray-light);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  z-index: 10;
+  transition: left 0.3s ease, background 0.2s;
+}
+
+.sidebar-toggle-desktop:hover { background: var(--blue); color: var(--white); }
+
+.sidebar.collapsed ~ .sidebar-toggle-desktop,
+.main-layout.sidebar-hidden .sidebar-toggle-desktop {
+  left: 0;
+}
+
+/* Contact link styles */
+.contact-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 8px;
+  color: var(--blue-light);
+  text-decoration: none;
+  font-size: 13px;
+  transition: all 0.15s;
+  margin: 3px 0;
+}
+
+.contact-link:hover { background: rgba(0,85,255,0.2); color: var(--white); }
+.contact-link-icon { font-size: 15px; flex-shrink: 0; }
+.contact-link-line { color: var(--green); }
+.contact-link-line:hover { background: rgba(0,200,83,0.2); }
+.contact-link-phone { color: var(--yellow); }
+.contact-link-phone:hover { background: rgba(255,214,0,0.2); }
+.contact-link-email { color: var(--blue-light); }
+.contact-link-email:hover { background: rgba(0,85,255,0.2); }
+
+.contact-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px 0;
+}
+
+/* Task link */
+.task-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(0,85,255,0.1);
+  border-radius: 8px;
+  color: var(--blue-light);
+  text-decoration: none;
+  font-size: 13px;
+  transition: all 0.15s;
+  word-break: break-all;
+}
+
+.task-link:hover { background: rgba(0,85,255,0.25); color: var(--white); }
+
+/* Form contact grid */
+.form-contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.form-contact-grid .form-group { margin-bottom: 0; }
 
 .sidebar-section { margin-bottom: 24px; }
 
@@ -1179,7 +1277,9 @@ body {
     width: 280px;
   }
   .sidebar.open { transform: translateX(0); }
+  .sidebar.collapsed { width: 280px; padding: 20px 16px; opacity: 1; }
   .hamburger { display: flex; }
+  .sidebar-toggle-desktop { display: none !important; }
 
   .task-card {
     grid-template-columns: 32px 1fr 100px 80px 40px;
@@ -1213,6 +1313,7 @@ body {
   /* Task cards become stacked on mobile */
   .task-card { display: none; }
   .task-card-mobile-wrap { display: block; }
+  .form-contact-grid { grid-template-columns: 1fr; }
 
   .kanban-col { min-width: 260px; }
   .kanban-board {
@@ -1317,7 +1418,7 @@ body {
 <nav class="topnav">
   <button class="hamburger" onclick="toggleSidebar()" aria-label="เมนู">&#9776;</button>
   <div class="logo">
-    <div class="logo-icon">T</div>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABZ0lEQVR4nO2ZMWoCQRSG/1kWIXY5gZWgKVJYJ0fIEbxY7pDeWxhSGCwCwcYTKJjCTaWIjjMrLO9f9/1f6Qwz//t8+1A24AaqBapb9rMITwi19+Y23EvR18jJKFKL9148kK8haqcLhceIdcNFB3S1eCBeW5Hb0DXOa0zOAA8cBXj49g+c1lqcf+CFQ816BNgB2ASP7X+K+w6QAHYANu4FlE0d9DIdYv790NRxSV4nG8zefxo5y30HSAA7ABv3Asx/CY7fRlite9G14WCHz4+lZRx1gASwA7CRAHYANhLADsBGAtgB2LgXUPs9elP0+8+/AAZXlpfb7dfIMA5KGEuoqj+EEP8vsN/vYJ3HXEANJMDyshL2gzBVYIBxHnWA9YU1kADLyxgzIIVmAPQIdF9A7j7XMwDQDLDNEwA8Wl7YNtrYAaa0cQaYog6ABEiAZgA7BBMJgARoBrjvAAlgh2CiGQB1gAS4FvAP/YNC5yiOIpAAAAAASUVORK5CYII=" alt="RetroTask" class="logo-img">
     <span>RETROTASK</span>
   </div>
   <div class="nav-views" id="navViews">
@@ -1350,7 +1451,7 @@ body {
 <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
 
 <!-- MAIN LAYOUT -->
-<div class="main-layout">
+<div class="main-layout" id="mainLayout" style="position:relative">
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-section">
@@ -1415,6 +1516,9 @@ body {
       </div>
     </div>
   </aside>
+
+  <!-- SIDEBAR TOGGLE (desktop) -->
+  <button class="sidebar-toggle-desktop" id="sidebarToggleDesktop" onclick="toggleSidebarDesktop()" title="ซ่อน/แสดงเมนู">&#9664;</button>
 
   <!-- CONTENT -->
   <main class="content" id="mainContent">
@@ -1487,8 +1591,25 @@ body {
         </div>
       </div>
       <div class="form-group">
-        <label class="form-label">คนที่ต้องประสาน</label>
-        <input type="text" class="form-input" id="fContact" placeholder="ชื่อ, เบอร์, หรืออีเมล">
+        <label class="form-label">&#128100; คนที่ต้องประสาน</label>
+        <div class="form-contact-grid">
+          <div class="form-group">
+            <input type="text" class="form-input" id="fContactName" placeholder="&#128100; ชื่อ">
+          </div>
+          <div class="form-group">
+            <input type="tel" class="form-input" id="fContactPhone" placeholder="&#128222; เบอร์โทร">
+          </div>
+          <div class="form-group">
+            <input type="email" class="form-input" id="fContactEmail" placeholder="&#9993; อีเมล">
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-input" id="fContactLine" placeholder="&#128172; LINE ID">
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">&#128279; ลิงก์ที่เกี่ยวข้อง</label>
+        <input type="url" class="form-input" id="fLink" placeholder="https://... (วางลิงก์เอกสาร, เว็บ, Drive ฯลฯ)">
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -1661,7 +1782,7 @@ function getFilteredTasks() {
   return tasks.filter(t => {
     if (currentFilter.status !== 'all' && t.status !== currentFilter.status) return false;
     if (currentFilter.type !== 'all' && t.type !== currentFilter.type) return false;
-    if (search && !t.name.toLowerCase().includes(search) && !(t.description||'').toLowerCase().includes(search) && !(t.contact||'').toLowerCase().includes(search)) return false;
+    if (search && !t.name.toLowerCase().includes(search) && !(t.description||'').toLowerCase().includes(search) && !(t.contactName||t.contact||'').toLowerCase().includes(search) && !(t.contactEmail||'').toLowerCase().includes(search) && !(t.contactPhone||'').toLowerCase().includes(search)) return false;
     return true;
   });
 }
@@ -1679,6 +1800,16 @@ function toggleSidebar() {
 function closeSidebar() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+let sidebarCollapsed = false;
+function toggleSidebarDesktop() {
+  const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('sidebarToggleDesktop');
+  sidebarCollapsed = !sidebarCollapsed;
+  sidebar.classList.toggle('collapsed', sidebarCollapsed);
+  toggleBtn.innerHTML = sidebarCollapsed ? '&#9654;' : '&#9664;';
+  toggleBtn.style.left = sidebarCollapsed ? '0' : '260px';
 }
 
 function toggleMobileSearch() {
@@ -1742,8 +1873,8 @@ function renderListView(filtered) {
             </div>
             <div class="tc-bottom">
               <div>
-                ${t.contact ? `&#128100; ${esc(t.contact)}` : ''}
-                ${t.contact && endStr ? ' &middot; ' : ''}
+                ${(t.contactName||t.contact) ? `&#128100; ${esc(t.contactName||t.contact)}` : ''}
+                ${(t.contactName||t.contact) && endStr ? ' &middot; ' : ''}
                 ${endStr ? `&#128197; ${endStr}` : ''}
               </div>
               <div class="tc-actions">
@@ -1773,7 +1904,7 @@ function renderListView(filtered) {
           <div class="task-desc">${esc(t.description||'')}</div>
         </div>
         <span class="task-type-badge ${typeClass}">${esc(typeName)}</span>
-        <span class="task-contact">${esc(t.contact||'-')}</span>
+        <span class="task-contact">${esc(t.contactName||t.contact||'-')}</span>
         <span class="task-status-badge ${STATUS_CLASS[t.status]}">${STATUS_MAP[t.status]}</span>
         <span class="task-date">${endStr}</span>
         <div class="task-actions">
@@ -1818,7 +1949,7 @@ function renderKanbanView(filtered) {
           <div class="kanban-card-meta">
             <span class="kanban-card-tag ${typeClass}">${esc(typeName)}</span>
             ${t.priority==='high'?'<span class="kanban-card-tag" style="background:rgba(255,59,92,0.15);color:var(--red)">&#9888; สูง</span>':''}
-            ${t.contact?`<span class="kanban-card-tag">&#128100; ${esc(t.contact)}</span>`:''}
+            ${(t.contactName||t.contact)?`<span class="kanban-card-tag">&#128100; ${esc(t.contactName||t.contact)}</span>`:''}
           </div>
           ${t.endDate?`<div class="kanban-card-date">&#128197; ${formatDateShort(t.endDate)}</div>`:''}
         </div>`;
@@ -1978,7 +2109,7 @@ function renderCalDay(filtered) {
       const typeClass = TYPE_CLASS[t.type] || 'type-custom';
       html += `<div class="cal-dv-event ${typeClass}" onclick="openDetail('${t.id}')">
         <strong>${esc(t.name)}</strong>
-        ${t.contact ? ` &middot; ${esc(t.contact)}` : ''}
+        ${(t.contactName||t.contact) ? ` &middot; ${esc(t.contactName||t.contact)}` : ''}
       </div>`;
     });
     html += '</div></div>';
@@ -2048,7 +2179,11 @@ function openModal(id) {
       document.getElementById('fCustomType').value = t.customType || '';
     }
     document.getElementById('fStatus').value = t.status;
-    document.getElementById('fContact').value = t.contact || '';
+    document.getElementById('fContactName').value = t.contactName || t.contact || '';
+    document.getElementById('fContactPhone').value = t.contactPhone || '';
+    document.getElementById('fContactEmail').value = t.contactEmail || '';
+    document.getElementById('fContactLine').value = t.contactLine || '';
+    document.getElementById('fLink').value = t.link || '';
     document.getElementById('fStart').value = t.startDate || '';
     document.getElementById('fEnd').value = t.endDate || '';
     document.getElementById('fReminder').value = t.reminder || '0';
@@ -2063,7 +2198,11 @@ function openModal(id) {
     document.getElementById('customTypeGroup').style.display = 'none';
     document.getElementById('fCustomType').value = '';
     document.getElementById('fStatus').value = 'open';
-    document.getElementById('fContact').value = '';
+    document.getElementById('fContactName').value = '';
+    document.getElementById('fContactPhone').value = '';
+    document.getElementById('fContactEmail').value = '';
+    document.getElementById('fContactLine').value = '';
+    document.getElementById('fLink').value = '';
     document.getElementById('fStart').value = '';
     document.getElementById('fEnd').value = '';
     document.getElementById('fReminder').value = '0';
@@ -2091,7 +2230,11 @@ function saveTask() {
     type,
     customType: type === 'custom' ? document.getElementById('fCustomType').value.trim() : '',
     status: document.getElementById('fStatus').value,
-    contact: document.getElementById('fContact').value.trim(),
+    contactName: document.getElementById('fContactName').value.trim(),
+    contactPhone: document.getElementById('fContactPhone').value.trim(),
+    contactEmail: document.getElementById('fContactEmail').value.trim(),
+    contactLine: document.getElementById('fContactLine').value.trim(),
+    link: document.getElementById('fLink').value.trim(),
     startDate: document.getElementById('fStart').value,
     endDate: document.getElementById('fEnd').value,
     reminder: document.getElementById('fReminder').value,
@@ -2166,6 +2309,26 @@ function openDetail(id) {
   const prioMap = { low: 'ต่ำ', medium: 'ปานกลาง', high: 'สูง' };
 
   document.getElementById('detailTitle').textContent = t.name;
+
+  // Build contact section
+  const hasContact = t.contactName || t.contactPhone || t.contactEmail || t.contactLine || t.contact;
+  let contactHtml = '';
+  if (hasContact) {
+    contactHtml = `<div class="form-label" style="margin-top:14px">&#128100; คนที่ต้องประสาน</div><div class="contact-grid">`;
+    if (t.contactName || t.contact) contactHtml += `<span class="contact-link"><span class="contact-link-icon">&#128100;</span> ${esc(t.contactName || t.contact)}</span>`;
+    if (t.contactPhone) contactHtml += `<a href="tel:${esc(t.contactPhone)}" class="contact-link contact-link-phone" title="โทรออก"><span class="contact-link-icon">&#128222;</span> ${esc(t.contactPhone)}</a>`;
+    if (t.contactEmail) contactHtml += `<a href="mailto:${esc(t.contactEmail)}" class="contact-link contact-link-email" title="ส่งอีเมล"><span class="contact-link-icon">&#9993;</span> ${esc(t.contactEmail)}</a>`;
+    if (t.contactLine) contactHtml += `<a href="https://line.me/R/ti/p/~${encodeURIComponent(t.contactLine)}" target="_blank" class="contact-link contact-link-line" title="เปิด LINE"><span class="contact-link-icon">&#128172;</span> ${esc(t.contactLine)}</a>`;
+    contactHtml += '</div>';
+  }
+
+  // Build link section
+  let linkHtml = '';
+  if (t.link) {
+    linkHtml = `<div class="form-label" style="margin-top:14px">&#128279; ลิงก์</div>
+      <a href="${esc(t.link)}" target="_blank" rel="noopener" class="task-link">&#128279; ${esc(t.link.length > 60 ? t.link.substring(0,60)+'...' : t.link)}</a>`;
+  }
+
   document.getElementById('detailBody').innerHTML = `
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
       <span class="task-type-badge ${typeClass}">${esc(typeName)}</span>
@@ -2173,7 +2336,8 @@ function openDetail(id) {
       ${t.priority==='high'?'<span class="task-status-badge" style="background:rgba(255,59,92,0.15);color:var(--red)">&#9888; ความสำคัญสูง</span>':''}
     </div>
     ${t.description?`<div class="form-label">รายละเอียด</div><div class="detail-notes">${esc(t.description)}</div>`:''}
-    ${t.contact?`<div class="form-label" style="margin-top:14px">&#128100; คนที่ต้องประสาน</div><div style="font-size:14px;padding:6px 0">${esc(t.contact)}</div>`:''}
+    ${contactHtml}
+    ${linkHtml}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
       <div><div class="form-label">&#128197; เริ่มงาน</div><div style="font-size:14px">${t.startDate?formatDateFull(t.startDate):'-'}</div></div>
       <div><div class="form-label">&#128197; กำหนดเสร็จ</div><div style="font-size:14px">${t.endDate?formatDateFull(t.endDate):'-'}</div></div>
